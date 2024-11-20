@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 import "@/app/styles/globals.css";
 import "@/app/styles/main.scss";
@@ -23,6 +24,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${NOTO_SANS_KR.className} antialiased`}>
                 {children}
+                <Toaster />
             </body>
         </html>
     );

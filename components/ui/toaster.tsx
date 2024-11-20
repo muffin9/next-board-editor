@@ -10,7 +10,7 @@ import {
     ToastViewport,
 } from "@/components/ui/toast";
 
-export function Toaster(p0: { title: string }) {
+export function Toaster() {
     const { toasts } = useToast();
 
     return (

@@ -38,7 +38,7 @@ export const selectBoardsByPageId = async (pageId: string) => {
     try {
         const { data, status } = await supabase
             .from("board-list")
-            .select("boards")
+            .select("*")
             .eq("id", pageId);
 
         if (status === 200 && data) {
@@ -62,20 +62,16 @@ export const insertBoard = async (id: string) => {
         const newBoardId = uuidv4();
 
         const createBoard = {
-            id,
+            id: newBoardId,
             title: "",
             start_date: formattedDate,
             end_date: null,
             content: "",
         };
 
-        let newBoards = [];
-
-        if (currentBoards) {
-            newBoards = [...currentBoards, createBoard];
-        } else {
-            newBoards = [createBoard];
-        }
+        const newBoards = currentBoards
+            ? [...currentBoards, createBoard]
+            : [createBoard];
 
         // Update board-list set boards = newBoards
         const { data: updateBoards, status } = await supabase
@@ -87,6 +83,44 @@ export const insertBoard = async (id: string) => {
         if (status === 200 && updateBoards) {
             return newBoardId;
         }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const updateBoardList = async ({
+    id,
+    title,
+    startDate,
+    endDate,
+}: {
+    id: string;
+    title: string;
+    startDate: Date;
+    endDate: Date;
+}) => {
+    const { data: boards, status } = await supabase
+        .from("board-list")
+        .update({
+            title,
+            start_date: startDate,
+            end_date: endDate,
+        })
+        .eq("id", id);
+
+    if (status === 204) {
+        return boards;
+    }
+};
+
+export const deleteBoardList = async (id: string) => {
+    try {
+        const { status } = await supabase
+            .from("board-list")
+            .delete()
+            .eq("id", +id);
+
+        return status;
     } catch (error) {
         console.error(error);
     }

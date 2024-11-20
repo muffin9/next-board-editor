@@ -3,20 +3,15 @@
 import styles from "./page.module.scss";
 import { BoardCard, BoardHeader } from "@/app/features";
 import { BoardAside } from "@/app/features/BoardAside";
+
+import { Button, CommonAlertDialog } from "@/components/ui";
 import useGetBoards from "@/hooks/use-get-boards";
+import { useToast } from "@/hooks/use-toast";
+import { deleteBoardList, insertBoard } from "@/lib/query";
+import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { useState } from "react";
-
-interface BoardContentType {
-    id: string;
-    isChecked: boolean;
-    title: string;
-    startDate: Date;
-    endDate: Date;
-    content: string;
-}
+import { useParams, useRouter } from "next/navigation";
 
 export interface BoardType {
     id: string;
@@ -27,16 +22,47 @@ export interface BoardType {
 }
 
 export default function BoardUniquePage() {
+    const router = useRouter();
+    const { toast } = useToast();
     const { id } = useParams();
-    const [isAddTask, setIsTask] = useState(false);
 
-    const { tasks } = useGetBoards(id.toString());
-    console.log(tasks);
+    const { tasks, getBoards } = useGetBoards(id.toString());
+
+    const handleDeleteAll = async () => {
+        const status = await deleteBoardList(id.toString());
+
+        if (status === 204) {
+            toast({
+                title: "선택한 BOARD들이 삭제되었습니다.",
+            });
+            router.push("/");
+        }
+    };
+
+    const handleInsertBoard = async () => {
+        const boardId = await insertBoard(id.toString());
+
+        if (boardId) {
+            toast({
+                title: "TODO 하나 추가 되었습니다.",
+                duration: 1000,
+            });
+            getBoards();
+        }
+    };
+
     return (
         <div className="page">
             <BoardAside />
             <main className="page__main">
-                <BoardHeader setIsTask={setIsTask} />
+                <BoardHeader
+                    handleInsertBoard={handleInsertBoard}
+                    headerData={{
+                        headerTitle: "testtest",
+                        headerStartDate: new Date(),
+                        headerEndDate: new Date(),
+                    }}
+                />
 
                 <div className={styles.body}>
                     {tasks === null ? (
@@ -58,13 +84,46 @@ export default function BoardUniquePage() {
                         </div>
                     ) : (
                         <div className={styles.body__isData}>
+                            <div className="w-full flex justify-between text-orange-500">
+                                <span>총 Task 개수: {tasks?.length || 0}</span>
+                                <CommonAlertDialog
+                                    triggerElement={
+                                        <Button
+                                            variant="destructive"
+                                            size="default"
+                                        >
+                                            전체 삭제
+                                        </Button>
+                                    }
+                                    title="해당 TASK를 정말로 삭제하시겠습니까?"
+                                    description="삭제되면 복구가 불가능합니다."
+                                >
+                                    <div className="flex gap-4">
+                                        <AlertDialogCancel>
+                                            <span className="text-xs">
+                                                취소
+                                            </span>
+                                        </AlertDialogCancel>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={handleDeleteAll}
+                                        >
+                                            삭제하기
+                                        </Button>
+                                    </div>
+                                </CommonAlertDialog>
+                            </div>
+
                             {tasks &&
-                                tasks.map((task) => {
-                                    return <BoardCard key={task.id} />;
+                                tasks.map((task, idx) => {
+                                    return (
+                                        <BoardCard
+                                            key={task.id}
+                                            isActiveCard={idx === 0}
+                                        />
+                                    );
                                 })}
-                            {isAddTask && (
-                                <BoardCard isActiveCard={isAddTask} />
-                            )}
                         </div>
                     )}
                 </div>

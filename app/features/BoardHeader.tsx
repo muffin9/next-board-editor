@@ -2,33 +2,56 @@
 
 import { Button, LabelDatePicker, Progress } from "@/components/ui";
 import styles from "../board/[id]/page.module.scss";
-import { insertBoard } from "@/lib/query";
-import { useParams, usePathname } from "next/navigation";
-import { Dispatch, SetStateAction, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import useGetBoards from "@/hooks/use-get-boards";
+import { updateBoardList } from "@/lib/query";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface BoardHeaderProps {
-    setIsTask: Dispatch<SetStateAction<boolean>>;
+    handleInsertBoard: () => void;
+    headerData: {
+        headerTitle?: string;
+        headerStartDate?: Date;
+        headerEndDate?: Date;
+    };
 }
 
-function BoardHeader({ setIsTask }: BoardHeaderProps) {
-    const [headerTitle, setHeaderTitle] = useState("");
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+function BoardHeader({ handleInsertBoard, headerData }: BoardHeaderProps) {
+    const { toast } = useToast();
+
+    const [headerTitle, setHeaderTitle] = useState(
+        headerData.headerTitle || ""
+    );
+    const [headerStartDate, setHeaderStartDate] = useState<Date>(
+        headerData.headerStartDate || new Date()
+    );
+    const [headerEndDate, setHeaderEndDate] = useState<Date>(
+        headerData.headerEndDate || new Date()
+    );
 
     const { id } = useParams();
-    const { getBoards } = useGetBoards(id.toString());
 
     const save = async () => {
-        const { status, error } = await supabase
-            .from("board-list")
-            .update({ title: headerTitle })
-            .eq("id", id);
-        console.log(status);
-        if (status === 204) {
-            getBoards();
-            setHeaderTitle("");
+        try {
+            if (!headerTitle || !headerStartDate || !headerEndDate) {
+                return alert("값을 모두 채워 주세요.");
+            }
+
+            const boards = await updateBoardList({
+                id: id.toString(),
+                title: headerTitle,
+                startDate: headerStartDate,
+                endDate: headerEndDate,
+            });
+
+            if (boards) {
+                toast({
+                    title: "수정을 완료하였습니다.",
+                    duration: 1000,
+                });
+            }
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -40,6 +63,7 @@ function BoardHeader({ setIsTask }: BoardHeaderProps) {
                     type="text"
                     placeholder="Enter Title Here"
                     className={styles.header__top__input}
+                    value={headerTitle}
                     onChange={(e) => setHeaderTitle(e.target.value)}
                 />
                 {/* 진행상황 척도 Graph Section */}
@@ -62,13 +86,7 @@ function BoardHeader({ setIsTask }: BoardHeaderProps) {
                 </div>
                 <Button
                     className="text-white bg-[#E79057] hover:bg-[#E79057] hover:border hover:border-[#E26F24]"
-                    onClick={async () => {
-                        const boardId = await insertBoard(id as string);
-
-                        if (boardId) {
-                            setIsTask(true);
-                        }
-                    }}
+                    onClick={handleInsertBoard}
                 >
                     Add New Board
                 </Button>
