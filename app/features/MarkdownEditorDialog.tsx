@@ -92,9 +92,8 @@ function MarkdownEditorDialog({
                                 <Checkbox
                                     className="h-5 w-5 min-w-5"
                                     checked={isCompleted}
-                                    onCheckedChange={() =>
-                                        setIsCompleted(!isCompleted)
-                                    }
+                                    aria-readonly
+                                    disabled
                                 />
                                 <input
                                     type="text"

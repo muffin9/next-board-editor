@@ -20,15 +20,21 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { BoardType } from "../board/[id]/page";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface BoardCardProps {
     isActiveCard?: boolean;
     board: BoardType;
     getBoards: () => void;
+    setCheckCount: Dispatch<SetStateAction<number>>;
 }
 
-function BoardCard({ isActiveCard, board, getBoards }: BoardCardProps) {
+function BoardCard({
+    isActiveCard,
+    board,
+    getBoards,
+    setCheckCount,
+}: BoardCardProps) {
     const [isCompleted, setIsCompleted] = useState(board.isCompleted || false);
     const { toast } = useToast();
     const { id } = useParams();
@@ -75,7 +81,13 @@ function BoardCard({ isActiveCard, board, getBoards }: BoardCardProps) {
                         <Checkbox
                             className="w-[20px] h-[20px] border-[#DADADA]"
                             checked={isCompleted}
-                            onCheckedChange={() => setIsCompleted(!isCompleted)}
+                            onCheckedChange={() => {
+                                setIsCompleted(!isCompleted);
+
+                                setCheckCount((prevCount) =>
+                                    isCompleted ? prevCount - 1 : prevCount + 1
+                                );
+                            }}
                         />
                         <Input
                             type="text"

@@ -70,9 +70,6 @@ export const selectHeaderDataByPageId = async (pageId: string) => {
 };
 
 export const insertBoard = async (id: string) => {
-    const date = new Date();
-    const formattedDate = date.toISOString();
-
     try {
         // SELECT boards from board-list where id = id
 
@@ -84,7 +81,7 @@ export const insertBoard = async (id: string) => {
         const createBoard = {
             id: newBoardId,
             title: "",
-            startDate: formattedDate,
+            startDate: null,
             endDate: null,
             content: "",
             isCompleted: false,
@@ -141,11 +138,13 @@ export const updateBoardList = async ({
     title,
     startDate,
     endDate,
+    progress,
 }: {
     id: string;
     title: string;
     startDate: Date;
     endDate: Date;
+    progress: number;
 }) => {
     const { status } = await supabase
         .from("board-list")
@@ -153,6 +152,7 @@ export const updateBoardList = async ({
             title,
             startDate: startDate,
             endDate: endDate,
+            progress,
         })
         .eq("id", id);
 
@@ -180,12 +180,15 @@ export const deleteBoardById = async (id: string) => {
     }
 };
 
-export const selectBoardListProgress = async (id: string) => {
-    // progress를 DB에서 들고온다라...
+export const selectBoardListProgressById = async (id: string) => {
+    // progress를 DB에서 들고온다라... 그럼 체크할때마다 Update를 쳐야 하는건데.
+    // 데이터가 엄청 많아지면 progress를 백에서 관리하는게 더 좋을까?
+    // Chat GPT님의 답변 : 간편 조회, 속도 최적화, 기록 관리
+
     try {
-        const { status } = await supabase
+        const { data, status } = await supabase
             .from("board-list")
-            .select("*")
+            .select("progress")
             .eq("id", id);
     } catch (error) {
         console.error(error);

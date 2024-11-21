@@ -13,7 +13,7 @@ import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
 
 export interface BoardType {
     id: string;
@@ -30,6 +30,7 @@ export default function BoardUniquePage() {
     const { id } = useParams();
 
     const { tasks, getBoards } = useGetBoards(id.toString());
+    const [checkCount, setCheckCount] = useState<number>(0);
 
     const handleDeleteAll = async () => {
         const status = await deleteBoardList(id.toString());
@@ -60,7 +61,11 @@ export default function BoardUniquePage() {
         <div className="page">
             <BoardAside />
             <main className="page__main">
-                <BoardHeader handleInsertBoard={handleInsertBoard} />
+                <BoardHeader
+                    tasks={tasks || []}
+                    checkCount={checkCount}
+                    handleInsertBoard={handleInsertBoard}
+                />
 
                 <div className={styles.body}>
                     {tasks === null ? (
@@ -122,6 +127,7 @@ export default function BoardUniquePage() {
                                             board={task}
                                             isActiveCard={idx === 0}
                                             getBoards={getBoards}
+                                            setCheckCount={setCheckCount}
                                         />
                                     );
                                 })}

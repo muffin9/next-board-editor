@@ -14,6 +14,7 @@ export interface HeaderData {
     headerTitle: string;
     headerStartDate: Date;
     headerEndDate: Date;
+    progress: number;
 }
 
 function useGetBoards(id: string) {
@@ -23,13 +24,16 @@ function useGetBoards(id: string) {
     const getBoards = async () => {
         const currentBoards = await selectBoardListByPageId(id);
 
-        setTasks([...currentBoards.boards]);
+        if (currentBoards.boards) {
+            setTasks([...currentBoards.boards]);
 
-        setHeaderData({
-            headerTitle: currentBoards.title,
-            headerStartDate: currentBoards.startDate,
-            headerEndDate: currentBoards.endDate,
-        });
+            setHeaderData({
+                headerTitle: currentBoards.title,
+                headerStartDate: currentBoards.startDate,
+                headerEndDate: currentBoards.endDate,
+                progress: currentBoards.progress,
+            });
+        }
     };
 
     useEffect(() => {

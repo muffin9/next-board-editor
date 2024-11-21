@@ -4,15 +4,22 @@ import { Button, LabelDatePicker, Progress } from "@/components/ui";
 import styles from "../board/[id]/page.module.scss";
 import { updateBoardList } from "@/lib/query";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import useGetBoards from "@/hooks/use-get-boards";
+import { BoardType } from "../board/[id]/page";
 
 interface BoardHeaderProps {
     handleInsertBoard: () => void;
+    checkCount: number;
+    tasks: BoardType[];
 }
 
-function BoardHeader({ handleInsertBoard }: BoardHeaderProps) {
+function BoardHeader({
+    tasks,
+    checkCount,
+    handleInsertBoard,
+}: BoardHeaderProps) {
     const { toast } = useToast();
     const { id } = useParams();
 
@@ -25,14 +32,7 @@ function BoardHeader({ handleInsertBoard }: BoardHeaderProps) {
     const [headerEndDate, setHeaderEndDate] = useState<Date | undefined>(
         undefined
     );
-
-    useEffect(() => {
-        if (headerData) {
-            setHeaderTitle(headerData.headerTitle);
-            setHeaderStartDate(headerData.headerStartDate);
-            setHeaderEndDate(headerData.headerEndDate);
-        }
-    }, [headerData]);
+    const [progress, setProgress] = useState((checkCount / tasks.length) * 100);
 
     const save = async () => {
         try {
@@ -45,7 +45,10 @@ function BoardHeader({ handleInsertBoard }: BoardHeaderProps) {
                 title: headerTitle,
                 startDate: headerStartDate,
                 endDate: headerEndDate,
+                progress: progress,
             });
+
+            // TODO checkbox updateBoard 필요.
 
             if (status === 204) {
                 toast({
@@ -57,6 +60,15 @@ function BoardHeader({ handleInsertBoard }: BoardHeaderProps) {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        if (headerData) {
+            setHeaderTitle(headerData.headerTitle);
+            setHeaderStartDate(headerData.headerStartDate);
+            setHeaderEndDate(headerData.headerEndDate);
+            setProgress(headerData.progress);
+        }
+    }, [headerData]);
 
     return (
         <div className={styles.header}>
@@ -72,10 +84,10 @@ function BoardHeader({ handleInsertBoard }: BoardHeaderProps) {
                 {/* 진행상황 척도 Graph Section */}
                 <div className="flex items-center justify-start gap-3">
                     <small className="text-sm font-semibold text-[#6D6D6D]">
-                        1/10 Completed
+                        {checkCount}/{tasks?.length || 0} Completed
                     </small>
 
-                    <Progress className="w-60" />
+                    <Progress className="w-60" value={progress} />
                 </div>
             </div>
             <div className={styles.header__bottom}>
