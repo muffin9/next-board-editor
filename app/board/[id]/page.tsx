@@ -99,6 +99,7 @@ export default function BoardUniquePage() {
                                     description="삭제되면 복구가 불가능합니다."
                                 >
                                     <div className="flex gap-4">
+                                        {/* TODO 여기에 AlertDialogCancel 이 있는게 부적절하다 생각되어지며, Props로 넘기는게 좋을지 고민 필요. */}
                                         <AlertDialogCancel>
                                             <span className="text-xs">
                                                 취소
