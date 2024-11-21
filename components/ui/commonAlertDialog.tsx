@@ -32,9 +32,7 @@ function CommonAlertDialog({
                         {description}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogFooter>{children}</AlertDialogFooter>
-                </AlertDialogFooter>
+                <AlertDialogFooter>{children}</AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
     );

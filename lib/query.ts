@@ -34,7 +34,7 @@ export const insertBoardList = async ({
     }
 };
 
-export const selectBoardsByPageId = async (pageId: string) => {
+export const selectBoardListByPageId = async (pageId: string) => {
     try {
         const { data, status } = await supabase
             .from("board-list")
@@ -56,7 +56,7 @@ export const insertBoard = async (id: string) => {
     try {
         // SELECT boards from board-list where id = id
 
-        const currentBoards = await selectBoardsByPageId(id);
+        const currentBoards = await selectBoardListByPageId(id);
 
         // 얻어온 boards에 newBoards로 json data에 객체 하나 추가.
         const newBoardId = uuidv4();
@@ -118,7 +118,7 @@ export const deleteBoardList = async (id: string) => {
         const { status } = await supabase
             .from("board-list")
             .delete()
-            .eq("id", +id);
+            .eq("id", id);
 
         return status;
     } catch (error) {

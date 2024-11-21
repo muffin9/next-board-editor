@@ -1,5 +1,5 @@
 import { BoardType } from "@/app/board/[id]/page";
-import { selectBoardsByPageId } from "@/lib/query";
+import { selectBoardListByPageId } from "@/lib/query";
 import { useEffect, useState } from "react";
 
 export interface Task {
@@ -14,7 +14,7 @@ function useGetBoards(id: string) {
     const [tasks, setTasks] = useState<BoardType[]>();
 
     const getBoards = async () => {
-        const currentBoards = await selectBoardsByPageId(id);
+        const currentBoards = await selectBoardListByPageId(id);
         setTasks(currentBoards);
     };
 

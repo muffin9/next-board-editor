@@ -61,7 +61,7 @@ function BoardCard({ isActiveCard }: BoardCardProps) {
             <CardFooter>
                 <div className="w-full flex justify-center">
                     <MarkdownEditorDialog>
-                        <Button className="text-[#6D6D6D] bg-white text-sm cursor-pointer">
+                        <Button className="text-[#6D6D6D] hover:text-[#FFFFFF] bg-white text-sm cursor-pointer">
                             Add Contents
                         </Button>
                     </MarkdownEditorDialog>
