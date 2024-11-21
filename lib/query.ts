@@ -20,8 +20,8 @@ export const insertBoardList = async ({
             .insert([
                 {
                     title,
-                    created_at: formattedDate,
-                    srartDate: null,
+                    createdAt: formattedDate,
+                    startDate: null,
                     endDate: null,
                     boards,
                 },
@@ -59,7 +59,7 @@ export const selectHeaderDataByPageId = async (pageId: string) => {
         if (status === 200 && data) {
             const headerData = {
                 headerTitle: data[0].title,
-                headerStartDate: data[0].srartDate,
+                headerStartDate: data[0].startDate,
                 headerEndDate: data[0].endDate,
             };
             return headerData;
@@ -84,7 +84,7 @@ export const insertBoard = async (id: string) => {
         const createBoard = {
             id: newBoardId,
             title: "",
-            srartDate: formattedDate,
+            startDate: formattedDate,
             endDate: null,
             content: "",
             isCompleted: false,
@@ -118,7 +118,7 @@ export const insertBoard = async (id: string) => {
 //         const createBoard = {
 //             title: "",
 //             contents: "",
-//             srartDate: formattedDate,
+//             startDate: formattedDate,
 //             endDate: null,
 //             pageId: id,
 //         };
@@ -151,7 +151,7 @@ export const updateBoardList = async ({
         .from("board-list")
         .update({
             title,
-            srartDate: startDate,
+            startDate: startDate,
             endDate: endDate,
         })
         .eq("id", id);
