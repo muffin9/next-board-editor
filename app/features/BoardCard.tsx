@@ -13,15 +13,57 @@ import {
 
 import { ChevronUp } from "lucide-react";
 import { MarkdownEditorDialog } from "./MarkdownEditorDialog";
-import { useState } from "react";
+
 import clsx from "clsx";
+import { selectBoardListByPageId } from "@/lib/query";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+import { BoardType } from "../board/[id]/page";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface BoardCardProps {
     isActiveCard?: boolean;
+    board: BoardType;
+    getBoards: () => void;
 }
 
-function BoardCard({ isActiveCard }: BoardCardProps) {
-    const [title, setTitle] = useState("");
+function BoardCard({ isActiveCard, board, getBoards }: BoardCardProps) {
+    const [isCompleted, setIsCompleted] = useState(board.isCompleted || false);
+    const { toast } = useToast();
+    const { id } = useParams();
+
+    const handleDelete = async () => {
+        try {
+            const boardList = await selectBoardListByPageId(id.toString());
+
+            if (boardList) {
+                const { status } = await supabase
+                    .from("board-list")
+                    .update({
+                        boards: boardList.boards.filter(
+                            (currentBoard: BoardType) =>
+                                currentBoard.id !== board.id
+                        ),
+                    })
+                    .eq("id", id);
+
+                if (status === 204) {
+                    toast({
+                        title: "선택하신 board가 삭제되었습니다.",
+                        duration: 1000,
+                    });
+                    getBoards();
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        setIsCompleted(board.isCompleted);
+    }, [board]);
 
     return (
         <Card
@@ -30,13 +72,17 @@ function BoardCard({ isActiveCard }: BoardCardProps) {
             <CardHeader>
                 <CardTitle className="flex items-center justify-between gap-4">
                     <div className="w-full flex items-center gap-2">
-                        <Checkbox className="w-[20px] h-[20px] border-[#DADADA]" />
+                        <Checkbox
+                            className="w-[20px] h-[20px] border-[#DADADA]"
+                            checked={isCompleted}
+                            onCheckedChange={() => setIsCompleted(!isCompleted)}
+                        />
                         <Input
                             type="text"
                             placeholder="Board Title Here..."
                             className="flex-1 border-none"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            value={board.title}
+                            readOnly
                         />
                     </div>
                     <Button variant="ghost" size="icon">
@@ -45,14 +91,22 @@ function BoardCard({ isActiveCard }: BoardCardProps) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col">
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
-                        <LabelDatePicker label="From" />
-                        <LabelDatePicker label="To" />
+                        <LabelDatePicker
+                            label="From"
+                            date={board.startDate as Date}
+                        />
+                        <LabelDatePicker
+                            label="To"
+                            date={board.endDate as Date}
+                        />
                     </div>
-                    <div>
+                    <div className="flex gap-2">
                         <Button variant="ghost">Duplicate</Button>
-                        <Button variant="ghost">Delete</Button>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete
+                        </Button>
                     </div>
                 </div>
                 <Separator className="mt-4" />
@@ -60,7 +114,7 @@ function BoardCard({ isActiveCard }: BoardCardProps) {
 
             <CardFooter>
                 <div className="w-full flex justify-center">
-                    <MarkdownEditorDialog>
+                    <MarkdownEditorDialog data={board} getBoards={getBoards}>
                         <Button className="text-[#6D6D6D] hover:text-[#FFFFFF] bg-white text-sm cursor-pointer">
                             Add Contents
                         </Button>

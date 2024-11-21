@@ -8,17 +8,20 @@ import { Button, CommonAlertDialog } from "@/components/ui";
 import useGetBoards from "@/hooks/use-get-boards";
 import { useToast } from "@/hooks/use-toast";
 import { deleteBoardList, insertBoard } from "@/lib/query";
+
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export interface BoardType {
     id: string;
     title: string;
-    start_date: string | null;
-    end_date: string | null;
+    startDate: Date | null;
+    endDate: Date | null;
     content: string;
+    isCompleted: boolean;
 }
 
 export default function BoardUniquePage() {
@@ -51,18 +54,13 @@ export default function BoardUniquePage() {
         }
     };
 
+    // console.log("PAGE!!!!"); // strict mode를 감안하면 3번이 찍히고 있다.
+
     return (
         <div className="page">
             <BoardAside />
             <main className="page__main">
-                <BoardHeader
-                    handleInsertBoard={handleInsertBoard}
-                    headerData={{
-                        headerTitle: "testtest",
-                        headerStartDate: new Date(),
-                        headerEndDate: new Date(),
-                    }}
-                />
+                <BoardHeader handleInsertBoard={handleInsertBoard} />
 
                 <div className={styles.body}>
                     {tasks === null ? (
@@ -121,7 +119,9 @@ export default function BoardUniquePage() {
                                     return (
                                         <BoardCard
                                             key={task.id}
+                                            board={task}
                                             isActiveCard={idx === 0}
+                                            getBoards={getBoards}
                                         />
                                     );
                                 })}

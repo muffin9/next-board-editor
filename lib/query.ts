@@ -21,8 +21,8 @@ export const insertBoardList = async ({
                 {
                     title,
                     created_at: formattedDate,
-                    start_date: null,
-                    end_date: null,
+                    srartDate: null,
+                    endDate: null,
                     boards,
                 },
             ])
@@ -42,7 +42,27 @@ export const selectBoardListByPageId = async (pageId: string) => {
             .eq("id", pageId);
 
         if (status === 200 && data) {
-            return data[0].boards;
+            return data[0];
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const selectHeaderDataByPageId = async (pageId: string) => {
+    try {
+        const { data, status } = await supabase
+            .from("board-list")
+            .select("*")
+            .eq("id", pageId);
+
+        if (status === 200 && data) {
+            const headerData = {
+                headerTitle: data[0].title,
+                headerStartDate: data[0].srartDate,
+                headerEndDate: data[0].endDate,
+            };
+            return headerData;
         }
     } catch (error) {
         console.error(error);
@@ -56,7 +76,7 @@ export const insertBoard = async (id: string) => {
     try {
         // SELECT boards from board-list where id = id
 
-        const currentBoards = await selectBoardListByPageId(id);
+        const boardList = await selectBoardListByPageId(id);
 
         // 얻어온 boards에 newBoards로 json data에 객체 하나 추가.
         const newBoardId = uuidv4();
@@ -64,13 +84,14 @@ export const insertBoard = async (id: string) => {
         const createBoard = {
             id: newBoardId,
             title: "",
-            start_date: formattedDate,
-            end_date: null,
+            srartDate: formattedDate,
+            endDate: null,
             content: "",
+            isCompleted: false,
         };
 
-        const newBoards = currentBoards
-            ? [...currentBoards, createBoard]
+        const newBoards = boardList.boards
+            ? [...boardList.boards, createBoard]
             : [createBoard];
 
         // Update board-list set boards = newBoards
@@ -88,6 +109,33 @@ export const insertBoard = async (id: string) => {
     }
 };
 
+// 테이블 나눴을때
+// export const insertBoard = async (id: string) => {
+//     const date = new Date();
+//     const formattedDate = date.toISOString();
+
+//     try {
+//         const createBoard = {
+//             title: "",
+//             contents: "",
+//             srartDate: formattedDate,
+//             endDate: null,
+//             pageId: id,
+//         };
+
+//         const { data, status } = await supabase
+//             .from("board")
+//             .insert(createBoard)
+//             .select();
+
+//         if (status === 200) {
+//             return data;
+//         }
+//     } catch (error) {
+//         console.error(error);
+//     }
+// };
+
 export const updateBoardList = async ({
     id,
     title,
@@ -99,18 +147,16 @@ export const updateBoardList = async ({
     startDate: Date;
     endDate: Date;
 }) => {
-    const { data: boards, status } = await supabase
+    const { status } = await supabase
         .from("board-list")
         .update({
             title,
-            start_date: startDate,
-            end_date: endDate,
+            srartDate: startDate,
+            endDate: endDate,
         })
         .eq("id", id);
 
-    if (status === 204) {
-        return boards;
-    }
+    return status;
 };
 
 export const deleteBoardList = async (id: string) => {
@@ -121,6 +167,26 @@ export const deleteBoardList = async (id: string) => {
             .eq("id", id);
 
         return status;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const deleteBoardById = async (id: string) => {
+    try {
+        const { status } = await supabase.from("board").delete().eq("id", id);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const selectBoardListProgress = async (id: string) => {
+    // progress를 DB에서 들고온다라...
+    try {
+        const { status } = await supabase
+            .from("board-list")
+            .select("*")
+            .eq("id", id);
     } catch (error) {
         console.error(error);
     }
