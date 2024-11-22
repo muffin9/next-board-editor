@@ -3,7 +3,7 @@
 import { Button, SearchBar } from "@/components/ui";
 import { useParams, useRouter } from "next/navigation";
 import { insertBoardList } from "@/lib/query";
-import useGetBoardList from "@/hooks/use-get-board-list";
+import useGetBoardList from "@/hooks/boardList/use-get-board-list";
 import { Task } from "../types";
 import Link from "next/link";
 import { useState } from "react";

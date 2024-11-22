@@ -8,19 +8,19 @@ import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { BoardType, HeaderType } from "@/app/types";
 
-interface BoardHeaderProps {
+interface BoardListHeaderProps {
     handleInsertBoard: (id: string, ratio: number) => void;
     headerData: HeaderType | undefined;
     checkCount: number;
     tasks: BoardType[];
 }
 
-function BoardHeader({
+function BoardListHeader({
     tasks,
     headerData,
     checkCount,
     handleInsertBoard,
-}: BoardHeaderProps) {
+}: BoardListHeaderProps) {
     const { toast } = useToast();
     const { id } = useParams();
 
@@ -120,4 +120,4 @@ function BoardHeader({
     );
 }
 
-export { BoardHeader };
+export { BoardListHeader };

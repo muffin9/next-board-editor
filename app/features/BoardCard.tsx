@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Button,
     Card,
@@ -15,12 +17,11 @@ import { ChevronUp } from "lucide-react";
 import { MarkdownEditorDialog } from "./MarkdownEditorDialog";
 
 import clsx from "clsx";
-import { selectBoardListByPageId } from "@/lib/query";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+
 import { useParams } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { BoardType } from "@/app/types";
+import useGetBoards from "@/hooks/board/use-get-boards";
 
 interface BoardCardProps {
     isActiveCard?: boolean;
@@ -37,38 +38,11 @@ function BoardCard({
     setCheckCount,
     updateCheckBoard,
 }: BoardCardProps) {
-    const { toast } = useToast();
     const { id } = useParams();
 
     const [isCompleted, setIsCompleted] = useState(board.isCompleted);
 
-    const handleDelete = async () => {
-        try {
-            const boardList = await selectBoardListByPageId(id.toString());
-
-            if (boardList) {
-                const { status } = await supabase
-                    .from("board-list")
-                    .update({
-                        boards: boardList.boards.filter(
-                            (currentBoard: BoardType) =>
-                                currentBoard.id !== board.id
-                        ),
-                    })
-                    .eq("id", id);
-
-                if (status === 204) {
-                    toast({
-                        title: "선택하신 board가 삭제되었습니다.",
-                        duration: 1000,
-                    });
-                    getBoards();
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    const { handleDeleteBoard } = useGetBoards(id.toString());
 
     return (
         <Card
@@ -119,7 +93,12 @@ function BoardCard({
                     </div>
                     <div className="flex gap-2">
                         <Button variant="ghost">Duplicate</Button>
-                        <Button variant="destructive" onClick={handleDelete}>
+                        <Button
+                            variant="destructive"
+                            onClick={() =>
+                                handleDeleteBoard(id.toString(), board.id)
+                            }
+                        >
                             Delete
                         </Button>
                     </div>
