@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BoardType, HeaderType } from "@/app/types";
 
 interface BoardHeaderProps {
-    handleInsertBoard: () => void;
+    handleInsertBoard: (id: string, ratio: number) => void;
     headerData: HeaderType | undefined;
     checkCount: number;
     tasks: BoardType[];
@@ -111,7 +111,7 @@ function BoardHeader({
                 </div>
                 <Button
                     className="text-white bg-[#E79057] hover:bg-[#E79057] hover:border hover:border-[#E26F24]"
-                    onClick={handleInsertBoard}
+                    onClick={() => handleInsertBoard(id.toString(), ratio)}
                 >
                     Add New Board
                 </Button>

@@ -36,8 +36,8 @@ export default function BoardUniquePage() {
         }
     };
 
-    const handleInsertBoard = async () => {
-        const boardId = await insertBoard(id.toString());
+    const handleInsertBoard = async (id: string, ratio: number) => {
+        const boardId = await insertBoard(id);
 
         if (boardId) {
             toast({
