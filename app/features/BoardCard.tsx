@@ -18,15 +18,16 @@ import clsx from "clsx";
 import { selectBoardListByPageId } from "@/lib/query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { BoardType } from "../board/[id]/page";
 import { useParams } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { BoardType } from "@/app/types";
 
 interface BoardCardProps {
     isActiveCard?: boolean;
     board: BoardType;
     getBoards: () => void;
     setCheckCount: Dispatch<SetStateAction<number>>;
+    updateCheckBoard: (boardId: string) => void;
 }
 
 function BoardCard({
@@ -34,10 +35,12 @@ function BoardCard({
     board,
     getBoards,
     setCheckCount,
+    updateCheckBoard,
 }: BoardCardProps) {
-    const [isCompleted, setIsCompleted] = useState(board.isCompleted || false);
     const { toast } = useToast();
     const { id } = useParams();
+
+    const [isCompleted, setIsCompleted] = useState(board.isCompleted);
 
     const handleDelete = async () => {
         try {
@@ -67,10 +70,6 @@ function BoardCard({
         }
     };
 
-    useEffect(() => {
-        setIsCompleted(board.isCompleted);
-    }, [board]);
-
     return (
         <Card
             className={clsx({ "border-[1px] border-orange-500": isActiveCard })}
@@ -87,6 +86,8 @@ function BoardCard({
                                 setCheckCount((prevCount) =>
                                     isCompleted ? prevCount - 1 : prevCount + 1
                                 );
+
+                                updateCheckBoard(board.id);
                             }}
                         />
                         <Input

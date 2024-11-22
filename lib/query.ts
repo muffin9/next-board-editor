@@ -1,3 +1,4 @@
+import { BoardType } from "@/app/types";
 import { supabase } from "./supabase";
 import { v4 as uuidv4 } from "uuid";
 
@@ -139,12 +140,14 @@ export const updateBoardList = async ({
     startDate,
     endDate,
     progress,
+    boards,
 }: {
     id: string;
     title: string;
     startDate: Date;
     endDate: Date;
     progress: number;
+    boards: BoardType[];
 }) => {
     const { status } = await supabase
         .from("board-list")
@@ -152,7 +155,8 @@ export const updateBoardList = async ({
             title,
             startDate: startDate,
             endDate: endDate,
-            progress,
+            progress: progress,
+            boards,
         })
         .eq("id", id);
 
@@ -175,21 +179,6 @@ export const deleteBoardList = async (id: string) => {
 export const deleteBoardById = async (id: string) => {
     try {
         const { status } = await supabase.from("board").delete().eq("id", id);
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-export const selectBoardListProgressById = async (id: string) => {
-    // progress를 DB에서 들고온다라... 그럼 체크할때마다 Update를 쳐야 하는건데.
-    // 데이터가 엄청 많아지면 progress를 백에서 관리하는게 더 좋을까?
-    // Chat GPT님의 답변 : 간편 조회, 속도 최적화, 기록 관리
-
-    try {
-        const { data, status } = await supabase
-            .from("board-list")
-            .select("progress")
-            .eq("id", id);
     } catch (error) {
         console.error(error);
     }

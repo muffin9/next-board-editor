@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabase";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { BoardType } from "../board/[id]/page";
+import { BoardType } from "@/app/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface MarkdownEditorDialogProps {

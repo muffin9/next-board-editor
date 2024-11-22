@@ -13,23 +13,16 @@ import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-
-export interface BoardType {
-    id: string;
-    title: string;
-    startDate: Date | null;
-    endDate: Date | null;
-    content: string;
-    isCompleted: boolean;
-}
+import { useEffect, useState } from "react";
 
 export default function BoardUniquePage() {
     const router = useRouter();
     const { toast } = useToast();
     const { id } = useParams();
 
-    const { tasks, getBoards } = useGetBoards(id.toString());
+    const { tasks, headerData, getBoards, dbCheckCount, updateCheckBoard } =
+        useGetBoards(id.toString());
+
     const [checkCount, setCheckCount] = useState<number>(0);
 
     const handleDeleteAll = async () => {
@@ -57,12 +50,17 @@ export default function BoardUniquePage() {
 
     // console.log("PAGE!!!!"); // strict mode를 감안하면 3번이 찍히고 있다.
 
+    useEffect(() => {
+        setCheckCount(dbCheckCount);
+    }, [dbCheckCount]);
+
     return (
         <div className="page">
             <BoardAside />
             <main className="page__main">
                 <BoardHeader
                     tasks={tasks || []}
+                    headerData={headerData || undefined}
                     checkCount={checkCount}
                     handleInsertBoard={handleInsertBoard}
                 />
@@ -128,6 +126,7 @@ export default function BoardUniquePage() {
                                             isActiveCard={idx === 0}
                                             getBoards={getBoards}
                                             setCheckCount={setCheckCount}
+                                            updateCheckBoard={updateCheckBoard}
                                         />
                                     );
                                 })}
