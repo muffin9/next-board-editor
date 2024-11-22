@@ -109,10 +109,12 @@ function BoardCard({
                         <LabelDatePicker
                             label="From"
                             date={board.startDate as Date}
+                            readonly
                         />
                         <LabelDatePicker
                             label="To"
                             date={board.endDate as Date}
+                            readonly
                         />
                     </div>
                     <div className="flex gap-2">

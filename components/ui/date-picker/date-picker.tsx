@@ -15,9 +15,10 @@ import { Calendar as CalendarIcon } from "lucide-react";
 interface BasicDatePickerProps {
     date: Date | undefined;
     setDate?: Dispatch<SetStateAction<Date | undefined>>;
+    readonly?: boolean;
 }
 
-function BasicDatePicker({ date, setDate }: BasicDatePickerProps) {
+function BasicDatePicker({ date, setDate, readonly }: BasicDatePickerProps) {
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -32,15 +33,17 @@ function BasicDatePicker({ date, setDate }: BasicDatePickerProps) {
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                />
-            </PopoverContent>
+            {!readonly && (
+                <PopoverContent className="w-auto p-0">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                    />
+                </PopoverContent>
+            )}
         </Popover>
     );
 }

@@ -12,7 +12,7 @@ export const insertBoardList = async ({
     boards = [],
 }: insertBoardListProps) => {
     const date = new Date();
-
+    date.setHours(date.getHours() + 9);
     const formattedDate = date.toISOString();
 
     try {
