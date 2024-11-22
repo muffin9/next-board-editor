@@ -62,27 +62,7 @@ export const selectBoardListByPageId = async (pageId: string) => {
     }
 };
 
-export const selectHeaderDataByPageId = async (pageId: string) => {
-    try {
-        const { data, status } = await supabase
-            .from("board-list")
-            .select("*")
-            .eq("id", pageId);
-
-        if (status === 200 && data) {
-            const headerData = {
-                headerTitle: data[0].title,
-                headerStartDate: data[0].startDate,
-                headerEndDate: data[0].endDate,
-            };
-            return headerData;
-        }
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-export const insertBoard = async (id: string) => {
+export const insertBoard = async (id: string, ratio: number) => {
     try {
         // SELECT boards from board-list where id = id
 
@@ -107,7 +87,7 @@ export const insertBoard = async (id: string) => {
         // Update board-list set boards = newBoards
         const { data: updateBoards, status } = await supabase
             .from("board-list")
-            .update({ boards: newBoards })
+            .update({ boards: newBoards, progress: ratio })
             .eq("id", id)
             .select();
 
@@ -118,33 +98,6 @@ export const insertBoard = async (id: string) => {
         console.error(error);
     }
 };
-
-// 테이블 나눴을때
-// export const insertBoard = async (id: string) => {
-//     const date = new Date();
-//     const formattedDate = date.toISOString();
-
-//     try {
-//         const createBoard = {
-//             title: "",
-//             contents: "",
-//             startDate: formattedDate,
-//             endDate: null,
-//             pageId: id,
-//         };
-
-//         const { data, status } = await supabase
-//             .from("board")
-//             .insert(createBoard)
-//             .select();
-
-//         if (status === 200) {
-//             return data;
-//         }
-//     } catch (error) {
-//         console.error(error);
-//     }
-// };
 
 export const updateBoardList = async ({
     id,
@@ -188,11 +141,23 @@ export const deleteBoardList = async (id: string) => {
     }
 };
 
-export const deleteBoardById = async (id: string) => {
+export const deleteBoardById = async (id: string, boardId: string) => {
     try {
-        const { status } = await supabase.from("board").delete().eq("id", id);
-        return status;
+        const boardList = await selectBoardListByPageId(id.toString());
+
+        if (boardList) {
+            const { status } = await supabase
+                .from("board-list")
+                .update({
+                    boards: boardList.boards.filter(
+                        (currentBoard: BoardType) => currentBoard.id !== boardId
+                    ),
+                })
+                .eq("id", id);
+
+            return status;
+        }
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 };

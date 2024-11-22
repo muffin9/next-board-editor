@@ -1,64 +1,58 @@
 "use client";
 
 import styles from "./page.module.scss";
-import { BoardCard, BoardHeader } from "@/app/features";
+import { BoardCard, BoardListHeader } from "@/app/features";
 import { BoardAside } from "@/app/features/BoardAside";
 
 import { Button, CommonAlertDialog } from "@/components/ui";
-import useGetBoards from "@/hooks/use-get-boards";
-import { useToast } from "@/hooks/use-toast";
-import { deleteBoardList, insertBoard } from "@/lib/query";
+import useGetBoards from "@/hooks/board/use-get-boards";
+import useGetBoardCount from "@/hooks/boardList/use-get-board-count";
 
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+
+function EmptyBoard() {
+    return (
+        <div className={styles.body__noData}>
+            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                There is no board yet.
+            </h3>
+            <small className="text-sm font-medium leading-none text-[#6D6D6D] mt-3 mb-7">
+                Click the button and start flashing!
+            </small>
+            <button onClick={() => console.log("TODO....")}>
+                <Image
+                    src="/assets/images/button.svg"
+                    width={74}
+                    height={74}
+                    alt="rounded-button"
+                />
+            </button>
+        </div>
+    );
+}
 
 export default function BoardUniquePage() {
-    const router = useRouter();
-    const { toast } = useToast();
     const { id } = useParams();
 
-    const { tasks, headerData, getBoards, dbCheckCount, updateCheckBoard } =
-        useGetBoards(id.toString());
+    const {
+        tasks,
+        headerData,
+        getBoards,
+        updateCheckBoard,
+        handleDeleteBoardListByPageId,
+        handleInsertBoard,
+    } = useGetBoards(id.toString());
 
-    const [checkCount, setCheckCount] = useState<number>(0);
-
-    const handleDeleteAll = async () => {
-        const status = await deleteBoardList(id.toString());
-
-        if (status === 204) {
-            toast({
-                title: "선택한 BOARD들이 삭제되었습니다.",
-            });
-            router.push("/");
-        }
-    };
-
-    const handleInsertBoard = async (id: string, ratio: number) => {
-        const boardId = await insertBoard(id);
-
-        if (boardId) {
-            toast({
-                title: "TODO 하나 추가 되었습니다.",
-                duration: 1000,
-            });
-            getBoards();
-        }
-    };
-
-    // console.log("PAGE!!!!"); // strict mode를 감안하면 3번이 찍히고 있다.
-
-    useEffect(() => {
-        setCheckCount(dbCheckCount);
-    }, [dbCheckCount]);
+    const { checkCount, setCheckCount } = useGetBoardCount(id.toString());
 
     return (
         <div className="page">
             <BoardAside />
             <main className="page__main">
-                <BoardHeader
+                <BoardListHeader
                     tasks={tasks || []}
                     headerData={headerData || undefined}
                     checkCount={checkCount}
@@ -67,22 +61,7 @@ export default function BoardUniquePage() {
 
                 <div className={styles.body}>
                     {tasks === null ? (
-                        <div className={styles.body__noData}>
-                            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                                There is no board yet.
-                            </h3>
-                            <small className="text-sm font-medium leading-none text-[#6D6D6D] mt-3 mb-7">
-                                Click the button and start flashing!
-                            </small>
-                            <button onClick={() => console.log("TODO....")}>
-                                <Image
-                                    src="/assets/images/button.svg"
-                                    width={74}
-                                    height={74}
-                                    alt="rounded-button"
-                                />
-                            </button>
-                        </div>
+                        <EmptyBoard />
                     ) : (
                         <div className={styles.body__isData}>
                             <div className="w-full flex justify-between text-orange-500">
@@ -109,7 +88,9 @@ export default function BoardUniquePage() {
                                         <Button
                                             variant="destructive"
                                             size="sm"
-                                            onClick={handleDeleteAll}
+                                            onClick={
+                                                handleDeleteBoardListByPageId
+                                            }
                                         >
                                             삭제하기
                                         </Button>

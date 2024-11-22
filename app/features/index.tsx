@@ -1,3 +1,3 @@
 export { BoardCard } from "./BoardCard";
-export { BoardHeader } from "./BoardHeader";
+export { BoardListHeader } from "./BoardListHeader";
 export { MarkdownEditorDialog } from "./MarkdownEditorDialog";
