@@ -35,6 +35,18 @@ export const insertBoardList = async ({
     }
 };
 
+export const selectBoardList = async (title?: string) => {
+    try {
+        const { data } = await supabase
+            .from("board-list")
+            .select("*")
+            .like("title", `${title ? `%${title}%` : "*"}`);
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 export const selectBoardListByPageId = async (pageId: string) => {
     try {
         const { data, status } = await supabase
