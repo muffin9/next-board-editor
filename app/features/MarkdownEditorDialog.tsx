@@ -39,31 +39,31 @@ function MarkdownEditorDialog({
         data.endDate || undefined
     );
     const [content, setContent] = useState(data.content);
-    const [isCompleted, setIsCompleted] = useState(data.isCompleted);
+
     const { id } = useParams();
 
     const handleInsert = async (selectedId: string) => {
         try {
-            const { data } = await supabase
+            const { data: boardList } = await supabase
                 .from("board-list")
                 .select("*")
                 .eq("id", id);
 
-            if (data && data !== null) {
-                data[0].boards.forEach((board: BoardType) => {
+            if (boardList && boardList !== null) {
+                boardList[0].boards.forEach((board: BoardType) => {
                     if (board.id === selectedId) {
                         board.title = title;
                         board.startDate = startDate as Date;
                         board.endDate = endDate as Date;
                         board.content = content;
-                        board.isCompleted = isCompleted;
+                        board.isCompleted = board.isCompleted;
                     }
                 });
 
                 const { status } = await supabase
                     .from("board-list")
                     .update({
-                        boards: data[0].boards,
+                        boards: boardList[0].boards,
                     })
                     .eq("id", id);
 
@@ -91,7 +91,7 @@ function MarkdownEditorDialog({
                             <div className="flex items-center gap-2">
                                 <Checkbox
                                     className="h-5 w-5 min-w-5"
-                                    checked={isCompleted}
+                                    checked={data.isCompleted}
                                     aria-readonly
                                     disabled
                                 />

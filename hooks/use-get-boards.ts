@@ -2,14 +2,6 @@ import { BoardType, HeaderType } from "@/app/types";
 import { selectBoardListByPageId } from "@/lib/query";
 import { useEffect, useState } from "react";
 
-export interface Task {
-    id: number;
-    title: string;
-    startDate: string | Date;
-    endDate: string | Date;
-    boards: BoardType[];
-}
-
 function useGetBoards(id: string) {
     const [tasks, setTasks] = useState<BoardType[]>();
     const [headerData, setHeaderData] = useState<HeaderType>();

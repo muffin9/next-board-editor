@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, SearchBar } from "@/components/ui";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { insertBoardList } from "@/lib/query";
 import useGetBoardList from "@/hooks/use-get-board-list";
 import { Task } from "../types";
@@ -11,6 +11,7 @@ import useDebounce from "@/hooks/use-debounce";
 
 function BoardAside() {
     const router = useRouter();
+    const { id } = useParams();
     const [searchValue, setSearchValue] = useState("");
     const { boardList, getBoardListByTitle } = useGetBoardList();
 
@@ -51,13 +52,17 @@ function BoardAside() {
                 <ul className="flex flex-col py-2 gap-2 px-[10px]">
                     {boardList &&
                         boardList.map((board: Task) => {
+                            const isActive = Number(board.id) === Number(id);
+
                             return (
                                 <Link
                                     href={`/board/${board.id}`}
                                     key={board.id}
                                 >
                                     <li
-                                        className={`flex items-center gap-2 py-2 px-[10px] bg-[#F5F5F5] hover:bg-[#F5F5F5]/90 rounded-sm cursor-pointer`}
+                                        className={`flex items-center gap-2 py-2 px-[10px] ${
+                                            isActive ? "bg-[#F5F5F5]" : "bg-red"
+                                        } hover:bg-[#F5F5F5]/90 rounded-sm cursor-pointer`}
                                     >
                                         <div className="w-2 h-2 bg-[#00F38D] rounded-full"></div>
                                         {board.title || "Empty Title"}

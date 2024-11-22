@@ -191,6 +191,7 @@ export const deleteBoardList = async (id: string) => {
 export const deleteBoardById = async (id: string) => {
     try {
         const { status } = await supabase.from("board").delete().eq("id", id);
+        return status;
     } catch (error) {
         console.error(error);
     }
