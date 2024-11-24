@@ -1,8 +1,8 @@
 "use server";
 
-import { Button } from "@/components/ui";
-import { BoardAside } from "./features/BoardAside";
-import { handleAddNewPage } from "./actions/board";
+import { Button } from "@/shared/ui";
+import { BoardAside } from "@/features/boardList/ui/BoardAside";
+import { handleAddNewPage } from "@/features/board/api/handleAddNewPage";
 
 export default async function HomePage() {
     return (

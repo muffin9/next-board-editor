@@ -1,12 +1,12 @@
 "use client";
 
 import styles from "./page.module.scss";
-import { BoardCard, BoardListHeader } from "@/app/features";
-import { BoardAside } from "@/app/features/BoardAside";
+import { BoardAside, BoardListHeader } from "@/features/boardList/ui";
+import { BoardCard } from "@/features/board/ui";
 
-import { Button, CommonAlertDialog } from "@/components/ui";
-import useGetBoards from "@/hooks/board/use-get-boards";
-import useGetBoardCount from "@/hooks/boardList/use-get-board-count";
+import { Button, CommonAlertDialog } from "@/shared/ui";
+import useGetBoards from "@/features/board/model/use-get-boards";
+import useGetBoardCount from "@/features/boardList/model/use-get-board-count";
 
 import { AlertDialogCancel } from "@radix-ui/react-alert-dialog";
 
