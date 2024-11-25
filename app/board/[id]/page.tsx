@@ -44,6 +44,7 @@ export default function BoardUniquePage() {
         updateCheckBoard,
         handleDeleteBoardListByPageId,
         handleInsertBoard,
+        handleDeleteBoard,
     } = useGetBoards(id.toString());
 
     const { checkCount, setCheckCount } = useGetBoardCount(id.toString());
@@ -108,6 +109,9 @@ export default function BoardUniquePage() {
                                             getBoards={getBoards}
                                             setCheckCount={setCheckCount}
                                             updateCheckBoard={updateCheckBoard}
+                                            handleDeleteBoard={
+                                                handleDeleteBoard
+                                            }
                                         />
                                     );
                                 })}

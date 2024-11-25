@@ -21,7 +21,6 @@ import clsx from "clsx";
 import { useParams } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { BoardType } from "../types";
-import useGetBoards from "@/features/board/model/use-get-boards";
 import { checkCount } from "../config/constants";
 
 interface BoardCardProps {
@@ -30,6 +29,7 @@ interface BoardCardProps {
     getBoards: () => void;
     setCheckCount: Dispatch<SetStateAction<number>>;
     updateCheckBoard: (boardId: string) => void;
+    handleDeleteBoard: (id: string, boardId: string) => void;
 }
 
 function BoardCard({
@@ -38,12 +38,11 @@ function BoardCard({
     getBoards,
     setCheckCount,
     updateCheckBoard,
+    handleDeleteBoard,
 }: BoardCardProps) {
     const { id } = useParams();
 
     const [isCompleted, setIsCompleted] = useState(board.isCompleted);
-
-    const { handleDeleteBoard } = useGetBoards(id.toString());
 
     return (
         <Card
