@@ -65,7 +65,13 @@ function BoardAside() {
                                             isActive ? "bg-[#F5F5F5]" : "bg-red"
                                         } hover:bg-[#F5F5F5]/90 rounded-sm cursor-pointer`}
                                     >
-                                        <div className="w-2 h-2 bg-[#00F38D] rounded-full"></div>
+                                        <div
+                                            className={`w-2 h-2 ${
+                                                isActive
+                                                    ? "bg-[#00F38D]"
+                                                    : "bg-[#F5F5F5]"
+                                            } rounded-full`}
+                                        ></div>
                                         {board.title || "Empty Title"}
                                     </li>
                                 </Link>
