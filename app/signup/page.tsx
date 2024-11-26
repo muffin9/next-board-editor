@@ -12,14 +12,17 @@ import {
     CardContent,
     Label,
     Input,
-    CommonAlertDialog,
 } from "@/shared/ui";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "../config/client";
+import { useToast } from "@/shared/lib/use-toast";
+import useEmailCheck from "@/features/user/model/use-email";
 
 function SignupPage() {
     const supabase = createClient();
     const router = useRouter();
+    const { checkEmail } = useEmailCheck();
+    const { toast } = useToast();
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState(false);
@@ -42,29 +45,49 @@ function SignupPage() {
         setPhoneNumber(formattedValue);
     };
 
-    const [dialogState, setDialogState] = useState({
-        title: "",
-        description: "",
-    });
-
     async function signupUser() {
+        if (!email || !password) {
+            toast({
+                variant: "destructive",
+                title: "기입되지 않는 데이터가 있습니다.",
+                description: "이메일과 비밀번호는 필수 값입니다.",
+            });
+            return;
+        }
+
+        if (!checkEmail(email)) {
+            toast({
+                variant: "destructive",
+                title: "올바르지 않은 이메일 양식입니다.",
+                description: "올바른 이메일 양식을 작성해주세요!",
+            });
+            return;
+        }
+
+        if (password.length < 8) {
+            toast({
+                variant: "destructive",
+                title: "비밀번호는 최소 8자 이상이어야 합니다.",
+                description: "보안에 신경써주세요!",
+            });
+            return;
+        }
+
         try {
             const { data } = await supabase.auth.signUp({
                 email: email,
                 password: password,
-                options: {
-                    emailRedirectTo: "http://localhost:3000",
-                },
             });
             const { user } = data;
 
             if (user) {
-                setDialogState({
+                toast({
                     title: "회원가입이 완료되었습니다.",
                     description: "로그인을 할 수 있습니다.",
                 });
+                router.push("/");
             } else {
-                setDialogState({
+                toast({
                     title: "회원가입 실패",
                     description:
                         "다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.",
@@ -72,7 +95,7 @@ function SignupPage() {
             }
         } catch (error) {
             console.error(error);
-            setDialogState({
+            toast({
                 title: "회원가입 실패",
                 description:
                     "다시 시도해주세요. 문제가 지속되면 관리자에게 문의하세요.",
@@ -114,6 +137,7 @@ function SignupPage() {
                                         </Label>
                                         <Input
                                             id="phone_number"
+                                            type="tel"
                                             placeholder="휴대폰 번호"
                                             maxLength={13}
                                             value={phoneNumber}
@@ -140,6 +164,8 @@ function SignupPage() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="비밀번호를 입력하세요."
+                                    minLength={8}
+                                    maxLength={16}
                                     value={password}
                                     onChange={handlePasswordChange}
                                 />
@@ -169,27 +195,15 @@ function SignupPage() {
                             <div className="flex items-center gap-4">
                                 <Button
                                     variant={"outline"}
-                                    className="w-full"
+                                    className="flex-1"
                                     onClick={() => router.push("/")}
                                 >
                                     이전
                                 </Button>
-                                <CommonAlertDialog
-                                    triggerElement={
-                                        <Button
-                                            className="w-full text-white bg-[#E79057] hover:bg-[#E26F24] hover:ring-1 hover:ring-[#E26F24] hover:ring-offset-1 active:bg-[#D5753D] hover:shadow-lg"
-                                            onClick={signupUser}
-                                        >
-                                            회원가입
-                                        </Button>
-                                    }
-                                    title={dialogState.title}
-                                    description={dialogState.description}
-                                >
-                                    <Button onClick={() => router.push("/")}>
-                                        확인
-                                    </Button>
-                                </CommonAlertDialog>
+
+                                <Button className="flex-1" onClick={signupUser}>
+                                    확인
+                                </Button>
                             </div>
                         </div>
                         <div className="mt-4 text-center text-sm">

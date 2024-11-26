@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     Button,
@@ -12,6 +12,8 @@ import {
     CardFooter,
     Label,
     Input,
+    CommonAlertDialog,
+    AlertDialogCancel,
 } from "@/shared/ui";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "./config/client";
@@ -19,10 +21,13 @@ import { toast } from "@/shared/lib/use-toast";
 import { useRouter } from "next/navigation";
 import { useSetAtom } from "jotai";
 import { userAtom } from "@/features/user/store/atoms";
+import useEmailCheck from "@/features/user/model/use-email";
+import { getKeyFromCookie } from "@/shared/lib/cookie";
 
 function LoginPage() {
     const supabase = createClient();
     const router = useRouter();
+    const { checkEmail } = useEmailCheck();
 
     const setUser = useSetAtom(userAtom);
 
@@ -38,15 +43,32 @@ function LoginPage() {
         setPassword(event.target.value);
 
     async function loginUser() {
+        if (!email || !password) {
+            toast({
+                variant: "destructive",
+                title: "기입되지 않는 데이터가 있습니다.",
+                description: "이메일과 비밀번호는 필수 값입니다.",
+            });
+            return;
+        }
+
+        if (!checkEmail(email)) {
+            toast({
+                variant: "destructive",
+                title: "올바르지 않은 이메일 양식입니다.",
+                description: "올바른 이메일 양식을 작성해주세요!",
+            });
+            return;
+        }
+
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
+
         const { user } = data;
 
         if (user) {
-            router.push("/board");
-
             const newUser = {
                 id: data.user?.id || "",
                 email: data.user?.email || "",
@@ -54,15 +76,28 @@ function LoginPage() {
                 imgUrl: "/assets/images/profile.jpg",
             };
 
+            document.cookie = `user=${encodeURIComponent(
+                JSON.stringify(newUser)
+            )}; path=/; max-age=86400`;
+
             setUser(newUser);
+            router.push("/board");
         } else {
             toast({
-                title: "알 수 없는 에러 발생",
+                variant: "destructive",
+                title: `에러 발생..`,
+                description: `${error}`,
                 duration: 2000,
             });
         }
         if (error) console.error(error);
     }
+
+    useEffect(() => {
+        // useEffect로 말고 다른 방법으로 가능한가?
+        const user = getKeyFromCookie("user");
+        if (user) router.push("/board");
+    }, []);
 
     return (
         <div className="w-full h-full">
@@ -101,14 +136,29 @@ function LoginPage() {
                             />
                         </div>
                         <div className="relative grid gap-2">
-                            <div className="flex items-center">
+                            <div className="flex justify-between items-center">
                                 <Label htmlFor="password">비밀번호</Label>
-                                <Link
-                                    href={"#"}
-                                    className="ml-auto inline-block text-sm underline"
+                                <CommonAlertDialog
+                                    triggerElement={
+                                        <Button
+                                            variant="ghost"
+                                            className="text-xs"
+                                        >
+                                            비밀번호 초기화
+                                        </Button>
+                                    }
+                                    title="비밀번호를 초기화 하시겠습니까?"
+                                    description="비밀번호 초기화하기."
                                 >
-                                    비밀번호를 잊으셨나요?
-                                </Link>
+                                    <AlertDialogCancel>
+                                        <Button
+                                            variant="ghost"
+                                            className="bg-transparent"
+                                        >
+                                            닫기
+                                        </Button>
+                                    </AlertDialogCancel>
+                                </CommonAlertDialog>
                             </div>
                             <Input
                                 id="password"
@@ -119,7 +169,7 @@ function LoginPage() {
                             />
                             <Button
                                 size="icon"
-                                className="absolute top-[38px] right-2 -translate-y-1/4 bg-transparent hover:bg-transparent"
+                                className="absolute top-[52px] right-2 -translate-y-1/4 bg-transparent hover:bg-transparent"
                                 onClick={showToggle}
                             >
                                 {showPassword ? (

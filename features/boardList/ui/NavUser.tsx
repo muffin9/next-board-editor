@@ -21,15 +21,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/shared/ui";
-import { UserType } from "@/features/user/store/atoms";
+import { initUserAtom, userAtom } from "@/features/user/store/atoms";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/app/config/client";
 import { useToast } from "@/shared/lib/use-toast";
+import { useSetAtom } from "jotai";
+import { UserType } from "@/features/user/types";
 
-export function NavUser({ user }: { user: UserType }) {
+export function NavUser({ user }: { user: UserType | null }) {
     const { toast } = useToast();
     const supabase = createClient();
     const router = useRouter();
+    const setUser = useSetAtom(userAtom);
+
     const handleLogout = async () => {
         try {
             const { error } = await supabase.auth.signOut();
@@ -41,6 +45,9 @@ export function NavUser({ user }: { user: UserType }) {
                 });
                 return;
             }
+
+            setUser(initUserAtom);
+
             toast({
                 title: "로그아웃이 성공적으로 완료되었습니다.",
                 description: "",
@@ -58,14 +65,14 @@ export function NavUser({ user }: { user: UserType }) {
                     className="py-6 px-3 flex items-center justify-evenly"
                 >
                     <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={user.imgUrl} alt={"image url"} />
+                        <AvatarImage src={user?.imgUrl} alt={"image url"} />
                         <AvatarFallback className="rounded-lg">
                             CN
                         </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">seongJin</span>
-                        <span className="truncate text-xs">{user.email}</span>
+                        <span className="truncate text-xs">{user?.email}</span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4" />
                 </Button>
@@ -79,7 +86,10 @@ export function NavUser({ user }: { user: UserType }) {
                 <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarImage src={user.imgUrl} alt="avatar image" />
+                            <AvatarImage
+                                src={user?.imgUrl}
+                                alt="avatar image"
+                            />
                             <AvatarFallback className="rounded-lg">
                                 CN
                             </AvatarFallback>
@@ -89,7 +99,7 @@ export function NavUser({ user }: { user: UserType }) {
                                 seongJin
                             </span>
                             <span className="truncate text-xs">
-                                {user.email}
+                                {user?.email}
                             </span>
                         </div>
                     </div>
