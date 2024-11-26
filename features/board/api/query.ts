@@ -1,11 +1,13 @@
 import { BoardType } from "@/features/board/types";
-import { supabase } from "@/app/config/supabase";
+import { createClient } from "@/app/config/client";
 import { v4 as uuidv4 } from "uuid";
 
 interface insertBoardListProps {
     title?: string;
     boards?: object;
 }
+
+const supabase = createClient();
 
 export const insertBoardList = async ({
     title = "",

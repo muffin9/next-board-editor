@@ -8,12 +8,17 @@ import { Task } from "@/features/board/types";
 import Link from "next/link";
 import { useState } from "react";
 import useDebounce from "@/shared/lib/use-debounce";
+import { NavUser } from "./NavUser";
+import { useAtomValue } from "jotai";
+import { userAtom } from "@/features/user/store/atoms";
 
 function BoardAside() {
     const router = useRouter();
     const { id } = useParams();
 
     const { boardList, getBoardListByTitle } = useGetBoardList();
+
+    const user = useAtomValue(userAtom);
 
     const debouncedHandleSearchValue = useDebounce(getBoardListByTitle, 500);
 
@@ -79,6 +84,7 @@ function BoardAside() {
                         })}
                 </ul>
             </div>
+            <NavUser user={user} />
         </aside>
     );
 }

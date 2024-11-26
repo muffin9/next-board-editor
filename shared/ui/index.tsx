@@ -44,3 +44,14 @@ export {
 } from "./alert-dialog";
 export { CommonAlertDialog } from "./commonAlertDialog";
 export { Toaster } from "./toaster";
+export { Label } from "./label";
+export {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "./dropdown-menu";
+export { Avatar, AvatarFallback, AvatarImage } from "./avatar";

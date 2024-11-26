@@ -14,7 +14,7 @@ import {
     Separator,
     DialogClose,
 } from "@/shared/ui";
-import { supabase } from "@/app/config/supabase";
+import { createClient } from "@/app/config/client";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -33,6 +33,7 @@ function MarkdownEditorDialog({
     getBoards,
 }: MarkdownEditorDialogProps) {
     const { toast } = useToast();
+    const supabase = createClient();
     const [title, setTitle] = useState(data.title);
     const [startDate, setStartDate] = useState<Date | undefined>(
         data.startDate || undefined
