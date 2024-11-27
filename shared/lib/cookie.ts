@@ -1,4 +1,4 @@
-export function getKeyFromCookie(key: string) {
+export function getCookieByKey(key: string) {
     const cookies = document.cookie.split("; ");
     const userCookie = cookies.find((cookie) => cookie.startsWith(`${key}=`));
     if (userCookie) {
@@ -6,4 +6,8 @@ export function getKeyFromCookie(key: string) {
         return user;
     }
     return null;
+}
+
+export function deleteCookieByKey(key: string) {
+    document.cookie = `${key}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
 }

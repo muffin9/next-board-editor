@@ -8,25 +8,33 @@ import {
 import { useEffect, useState } from "react";
 import { useToast } from "@/shared/lib/use-toast";
 import { useRouter } from "next/navigation";
+import useErrorBoundary from "@/shared/lib/use-error-boundary";
 
 function useGetBoards(id: string) {
     const router = useRouter();
     const { toast } = useToast();
+    const { handleError } = useErrorBoundary();
+
     const [tasks, setTasks] = useState<BoardType[]>();
     const [headerData, setHeaderData] = useState<HeaderType>();
 
     const getBoards = async () => {
-        const currentBoards = await selectBoardListByPageId(id);
+        try {
+            const currentBoards = await selectBoardListByPageId(id);
 
-        if (currentBoards.boards) {
-            setTasks([...currentBoards.boards]);
+            if (currentBoards.boards) {
+                setTasks([...currentBoards.boards]);
 
-            setHeaderData({
-                headerTitle: currentBoards.title,
-                headerStartDate: currentBoards.startDate,
-                headerEndDate: currentBoards.endDate,
-                progress: currentBoards.progress,
-            });
+                setHeaderData({
+                    headerTitle: currentBoards.title,
+                    headerStartDate: currentBoards.startDate,
+                    headerEndDate: currentBoards.endDate,
+                    progress: currentBoards.progress,
+                });
+            }
+        } catch (error) {
+            handleError();
+            console.error("Failed to fetch boards:", error);
         }
     };
 

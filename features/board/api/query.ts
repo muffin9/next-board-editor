@@ -1,6 +1,7 @@
 import { BoardType } from "@/features/board/types";
 import { createClient } from "@/app/config/client";
 import { v4 as uuidv4 } from "uuid";
+import { getAuthUser } from "@/features/user/api/query";
 
 interface insertBoardListProps {
     title?: string;
@@ -18,6 +19,9 @@ export const insertBoardList = async ({
     const formattedDate = date.toISOString();
 
     try {
+        // get user
+        const userId = await getAuthUser();
+
         const { data } = await supabase
             .from("board-list")
             .insert([
@@ -27,6 +31,7 @@ export const insertBoardList = async ({
                     startDate: null,
                     endDate: null,
                     boards,
+                    userId,
                 },
             ])
             .select();
@@ -39,9 +44,12 @@ export const insertBoardList = async ({
 
 export const selectBoardList = async (title?: string) => {
     try {
+        const userId = await getAuthUser();
+
         const { data } = await supabase
             .from("board-list")
             .select("*")
+            .eq("userId", userId)
             .like("title", `${title ? `%${title}%` : "*"}`);
         return data;
     } catch (error) {
@@ -51,9 +59,12 @@ export const selectBoardList = async (title?: string) => {
 
 export const selectBoardListByPageId = async (pageId: string) => {
     try {
+        const userId = await getAuthUser();
+
         const { data, status } = await supabase
             .from("board-list")
             .select("*")
+            .eq("userId", userId)
             .eq("id", pageId);
 
         if (status === 200 && data) {
@@ -67,7 +78,6 @@ export const selectBoardListByPageId = async (pageId: string) => {
 export const insertBoard = async (id: string, ratio: number) => {
     try {
         // SELECT boards from board-list where id = id
-
         const boardList = await selectBoardListByPageId(id);
 
         // 얻어온 boards에 newBoards로 json data에 객체 하나 추가.
