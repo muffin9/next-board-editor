@@ -9,10 +9,10 @@ import { useToast } from "@/shared/lib/use-toast";
 import { BoardType, HeaderType } from "@/features/board/types";
 
 interface BoardListHeaderProps {
-    handleInsertBoard: (id: string, ratio: number) => void;
+    tasks: BoardType[];
     headerData: HeaderType | undefined;
     checkCount: number;
-    tasks: BoardType[];
+    handleInsertBoard: (id: string, ratio: number) => void;
 }
 
 function BoardListHeader({
