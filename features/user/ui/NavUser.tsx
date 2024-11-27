@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    BadgeCheck,
-    Bell,
-    ChevronsUpDown,
-    CreditCard,
-    LogOut,
-    Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, UserRound } from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
@@ -27,6 +20,8 @@ import { createClient } from "@/app/config/client";
 import { useToast } from "@/shared/lib/use-toast";
 import { useSetAtom } from "jotai";
 import { UserType } from "@/features/user/types";
+import { deleteCookieByKey } from "@/shared/lib/cookie";
+import { UserEditProfile } from "./UserEditProfile";
 
 export function NavUser({ user }: { user: UserType | null }) {
     const { toast } = useToast();
@@ -46,6 +41,7 @@ export function NavUser({ user }: { user: UserType | null }) {
                 return;
             }
 
+            deleteCookieByKey("user");
             setUser(initUserAtom);
 
             toast({
@@ -57,6 +53,7 @@ export function NavUser({ user }: { user: UserType | null }) {
             console.error(error);
         }
     };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -105,26 +102,16 @@ export function NavUser({ user }: { user: UserType | null }) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <Sparkles />
-                        Upgrade to Pro
+                <DropdownMenuGroup className="flex items-center justify-between">
+                    <DropdownMenuItem className="flex justify-bewteen">
+                        <div className="w-full flex items-center gap-3">
+                            <UserRound />
+                            <small className="text-sm font-normal leading-none text-[#a6a6a6">
+                                Account
+                            </small>
+                        </div>
                     </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <BadgeCheck />
-                        Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <CreditCard />
-                        Billing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Bell />
-                        Notifications
-                    </DropdownMenuItem>
+                    <UserEditProfile />
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>

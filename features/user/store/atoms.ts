@@ -4,7 +4,8 @@ import { UserType } from "../types";
 export const initUserAtom: UserType = {
     id: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
+    nickname: "",
     imgUrl: "",
 };
 

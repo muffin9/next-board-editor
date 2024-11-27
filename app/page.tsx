@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
     Button,
@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { useSetAtom } from "jotai";
 import { userAtom } from "@/features/user/store/atoms";
 import useEmailCheck from "@/features/user/model/use-email";
-import { getKeyFromCookie } from "@/shared/lib/cookie";
+import { sampleProfileUrl } from "@/features/user/config/constants";
 
 function LoginPage() {
     const supabase = createClient();
@@ -72,8 +72,9 @@ function LoginPage() {
             const newUser = {
                 id: data.user?.id || "",
                 email: data.user?.email || "",
-                phone: data.user?.phone || "",
-                imgUrl: "/assets/images/profile.jpg",
+                phoneNumber: data.user?.user_metadata.phone_number || "",
+                nickname: data.user?.user_metadata.nickname || "",
+                imgUrl: sampleProfileUrl,
             };
 
             document.cookie = `user=${encodeURIComponent(
@@ -92,12 +93,6 @@ function LoginPage() {
         }
         if (error) console.error(error);
     }
-
-    useEffect(() => {
-        // useEffect로 말고 다른 방법으로 가능한가?
-        const user = getKeyFromCookie("user");
-        if (user) router.push("/board");
-    }, []);
 
     return (
         <div className="w-full h-full">

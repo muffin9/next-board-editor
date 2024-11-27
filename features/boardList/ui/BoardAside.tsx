@@ -8,7 +8,7 @@ import { Task } from "@/features/board/types";
 import Link from "next/link";
 import { useState } from "react";
 import useDebounce from "@/shared/lib/use-debounce";
-import { NavUser } from "./NavUser";
+import { NavUser } from "@/features/user/ui";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/features/user/store/atoms";
 

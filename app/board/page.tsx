@@ -1,10 +1,12 @@
-"use server";
+"use client";
 
 import { Button } from "@/shared/ui";
 import { BoardAside } from "@/features/boardList/ui/BoardAside";
-import { handleAddNewPage } from "@/features/board/api/handleAddNewPage";
+import { insertBoardList } from "@/features/board/api/query";
+import { useRouter } from "next/navigation";
 
-export default async function HomePage() {
+export default function HomePage() {
+    const router = useRouter();
     return (
         <div className="page">
             <BoardAside />
@@ -21,11 +23,16 @@ export default async function HomePage() {
                             2. Add boards to page
                         </small>
                     </div>
-                    <form action={handleAddNewPage}>
-                        <Button className="w-[150px] text-[#E79057] bg-white border border-[#E79057] hover:bg-[#FFF9F5]">
-                            Add New Page
-                        </Button>
-                    </form>
+
+                    <Button
+                        className="w-[150px] text-[#E79057] bg-white border border-[#E79057] hover:bg-[#FFF9F5]"
+                        onClick={async () => {
+                            const boardListId = await insertBoardList({});
+                            router.push(`/board/${boardListId}`);
+                        }}
+                    >
+                        Add New Page
+                    </Button>
                 </div>
             </main>
         </div>
